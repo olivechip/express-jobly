@@ -61,6 +61,29 @@ class Company {
     return companiesRes.rows;
   }
 
+  /** Filter companies based on name, minEmployees, and maxEmployees.
+   *
+   * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
+   * */
+
+  static async filter(name='', minEmployees=0, maxEmployees=1000000) {
+    if (minEmployees > maxEmployees){
+      throw new BadRequestError(`MinEmployees cannot be greater than maxEmployees`);
+    };
+    const companiesRes = await db.query(
+          `SELECT handle,
+                  name,
+                  description,
+                  num_employees AS "numEmployees",
+                  logo_url AS "logoUrl"
+           FROM companies
+           WHERE name ILIKE $1
+           AND num_employees >= $2
+           AND num_employees <= $3
+           ORDER BY name`, [`%${name}%`, minEmployees, maxEmployees]);
+    return companiesRes.rows;
+  }
+
   /** Given a company handle, return data about company.
    *
    * Returns { handle, name, description, numEmployees, logoUrl, jobs }

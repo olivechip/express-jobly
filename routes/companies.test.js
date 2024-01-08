@@ -96,6 +96,32 @@ describe("GET /companies", function () {
     });
   });
 
+  test("filters by name", async function(){
+    const resp = await request(app).get('/companies?name=c1');
+    expect(resp.status).toEqual(200);
+    expect(resp.body.companies).toHaveLength(1);
+  });
+  test("filters by minEmployees", async function(){
+    const resp = await request(app).get('/companies?minEmployees=2');
+    expect(resp.status).toEqual(200);
+    expect(resp.body.companies).toHaveLength(2);
+  });
+  test("filters by maxEmployees", async function(){
+    const resp = await request(app).get('/companies?maxEmployees=1');
+    expect(resp.status).toEqual(200);
+    expect(resp.body.companies).toHaveLength(1);
+  });
+  test("filters by min and maxEmployees", async function(){
+    const resp = await request(app).get('/companies?minEmployees=1&maxEmployees=2');
+    expect(resp.status).toEqual(200);
+    expect(resp.body.companies).toHaveLength(2);
+  });
+  test("returns error on min > maxEmployees", async function(){
+    const resp = await request(app).get('/companies?minEmployees=2&maxEmployees=1');
+    console.log(resp)
+    expect(resp.status).toEqual(400);
+  });
+
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
     // thus making it hard to test that the error-handler works with it. This
